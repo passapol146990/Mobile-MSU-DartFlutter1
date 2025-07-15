@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatelessWidget {
@@ -10,45 +12,130 @@ class LoginPage extends StatelessWidget {
         title: const Text('MyApp', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.black,
       ),
-      body: Container(
-        color: Colors.black87,
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              const Text(
-                '66011212067 พัสพล สุทาธรรม',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-                textAlign: TextAlign.center,
+      body: Expanded(
+        child: Container(
+          color: Colors.black87,
+          width: MediaQuery.of(context).size.width,
+          child: ListView(
+            children: [
+              InkWell(
+                onTap: clickImage,
+                child: Image.asset('assets/images/hacker.jpg'),
               ),
-              const SizedBox(height: 40),
-              ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepPurple,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 50,
-                    vertical: 15,
+              // GestureDetector(
+              //   onTap: clickImage,
+              //   child: Image.asset('assets/images/hacker.jpg'),
+              // ),
+              Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 50),
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 5),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    textAlign: TextAlign.start,
+                                    'หมายเลขโทรศัพท์',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                              TextField(
+                                style: TextStyle(color: Colors.white),
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide(width: 1),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    textAlign: TextAlign.start,
+                                    'รหัสผ่าน',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                              TextField(
+                                obscureText: true,
+                                style: TextStyle(color: Colors.white),
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide(width: 1),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    textAlign: TextAlign.start,
+                                    'ลงทะเบียนใหม่',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () =>
+                                        login("username", "password"),
+                                    style: ButtonStyle(
+                                      backgroundColor: WidgetStateProperty.all(
+                                        Colors.green,
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      'เข้าสู่ระบบ',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  elevation: 5,
-                ),
-                child: const Text(
-                  'เริ่มต้นบริการ',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
+                ],
               ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  void clickImage() {
+    log("image");
+  }
+
+  void login(u, p) {
+    log(u + ":" + p);
   }
 }
