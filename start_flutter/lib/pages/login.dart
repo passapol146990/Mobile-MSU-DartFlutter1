@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:start_flutter/pages/register.dart';
+import 'package:start_flutter/pages/showtrip.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -11,11 +12,12 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  String text = 'This is my text';
+  String text = '';
   int count = 0;
   String phoneNo = '';
   // TextEditingController phoneCtl = TextEditingController();
   var phoneCtl = TextEditingController();
+  var password = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -88,6 +90,7 @@ class _LoginPageState extends State<LoginPage> {
                                 ],
                               ),
                               TextField(
+                                controller: password,
                                 obscureText: true,
                                 style: TextStyle(color: Colors.white),
                                 decoration: InputDecoration(
@@ -98,6 +101,11 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ],
                           ),
+                        ),
+                        Row(
+                          children: [
+                            Text(text, style: TextStyle(color: Colors.white)),
+                          ],
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 10),
@@ -126,7 +134,7 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                   ElevatedButton(
                                     onPressed: () =>
-                                        login("username", "password"),
+                                        login(phoneCtl.text, password.text),
                                     style: ButtonStyle(
                                       backgroundColor: WidgetStateProperty.all(
                                         Colors.green,
@@ -140,14 +148,6 @@ class _LoginPageState extends State<LoginPage> {
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    text,
-                                    style: TextStyle(color: Colors.white),
                                   ),
                                 ],
                               ),
@@ -178,10 +178,19 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void login(String u, String p) {
-    log(phoneCtl.text);
-    // setState(() {
-    //   count++;
-    //   text = "Login : $count";
-    // });
+    if (u == 'admin' && p == "admin") {
+      log("login success");
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => ShowtripPage()),
+      );
+      setState(() {
+        text = '';
+      });
+    } else {
+      setState(() {
+        text = "เบอร์หรือรหัสผ่านไม่ถูกต้อง";
+      });
+    }
   }
 }
