@@ -68,6 +68,7 @@ class _LoginPageState extends State<LoginPage> {
                                 controller: phoneCtl,
                                 style: TextStyle(color: Colors.white),
                                 decoration: InputDecoration(
+                                  hintText: "admin",
                                   border: OutlineInputBorder(
                                     borderSide: BorderSide(width: 1),
                                   ),
@@ -94,6 +95,7 @@ class _LoginPageState extends State<LoginPage> {
                                 obscureText: true,
                                 style: TextStyle(color: Colors.white),
                                 decoration: InputDecoration(
+                                  hintText: "admin",
                                   border: OutlineInputBorder(
                                     borderSide: BorderSide(width: 1),
                                   ),
