@@ -54,43 +54,109 @@ class _ShowtripPageState extends State<ShowtripPage>
           ),
           Padding(
             padding: const EdgeInsets.all(15),
-            child: Column(
-              children: [
-                Row(children: [Text("อันซันสวิตเซอร์แลนด์")]),
-                Row(
+            child: Card(
+              clipBehavior: Clip.antiAlias,
+              elevation: 4.0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Image.network(
-                      width: 150,
-                      "https://static.amarintv.com/media/PJVlR0ljpN93yYFmwUH51mKzCj3KBj8f2mmG5zgiD3WqoM122Suv7ej6dCIKDeEKrL.jpg",
+                    Text(
+                      "อันซันสวิตเซอร์แลนด์",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.deepPurple,
+                      ),
                     ),
-                    Column(
+                    const SizedBox(height: 10),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [Text("ประเทศไทย")],
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8.0),
+                          child: Image.network(
+                            "https://static.amarintv.com/media/PJVlR0ljpN93yYFmwUH51mKzCj3KBj8f2mmG5zgiD3WqoM122Suv7ej6dCIKDeEKrL.jpg",
+                            width: 150,
+                            height: 100,
+                            fit: BoxFit.cover,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return SizedBox(
+                                width: 150,
+                                height: 100,
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    value:
+                                        loadingProgress.expectedTotalBytes !=
+                                            null
+                                        ? loadingProgress
+                                                  .cumulativeBytesLoaded /
+                                              loadingProgress
+                                                  .expectedTotalBytes!
+                                        : null,
+                                  ),
+                                ),
+                              );
+                            },
+                            errorBuilder: (context, error, stackTrace) {
+                              return SizedBox(
+                                width: 150,
+                                height: 100,
+                                child: Icon(Icons.error, color: Colors.red),
+                              );
+                            },
+                          ),
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [Text("ระยะเวลา 10 วัน")],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [Text("ราคา 90,000 บาท")],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            FilledButton(
-                              onPressed: () {},
-                              child: Text("รายละเอียดเพิ่มเติม"),
-                            ),
-                          ],
+                        const SizedBox(width: 15),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("ประเทศไทย", style: TextStyle(fontSize: 16)),
+                              const SizedBox(height: 4),
+                              Text(
+                                "ระยะเวลา 10 วัน",
+                                style: TextStyle(fontSize: 16),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                "ราคา 90,000 บาท",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.green[700],
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              Align(
+                                alignment: Alignment.bottomRight,
+                                child: FilledButton(
+                                  onPressed: () {},
+                                  style: FilledButton.styleFrom(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 20,
+                                      vertical: 10,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  child: const Text("รายละเอียดเพิ่มเติม"),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
           ),
         ],
