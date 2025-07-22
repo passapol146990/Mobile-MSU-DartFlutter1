@@ -1,9 +1,21 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:start_flutter/pages/register.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  String text = 'This is my text';
+  int count = 0;
+  String phoneNo = '';
+  // TextEditingController phoneCtl = TextEditingController();
+  var phoneCtl = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +58,12 @@ class LoginPage extends StatelessWidget {
                                 ],
                               ),
                               TextField(
+                                // onChanged: (value) => {
+                                //   setState(() {
+                                //     phoneNo = value;
+                                //   }),
+                                // },
+                                controller: phoneCtl,
                                 style: TextStyle(color: Colors.white),
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(
@@ -89,12 +107,21 @@ class LoginPage extends StatelessWidget {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    textAlign: TextAlign.start,
-                                    'ลงทะเบียนใหม่',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
+                                  ElevatedButton(
+                                    onPressed: () => register(),
+                                    style: ButtonStyle(
+                                      backgroundColor: WidgetStateProperty.all(
+                                        Colors.transparent,
+                                      ),
+                                      elevation: WidgetStateProperty.all(0),
+                                    ),
+                                    child: Text(
+                                      textAlign: TextAlign.start,
+                                      'ลงทะเบียนใหม่',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
                                   ElevatedButton(
@@ -113,6 +140,14 @@ class LoginPage extends StatelessWidget {
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    text,
+                                    style: TextStyle(color: Colors.white),
                                   ),
                                 ],
                               ),
@@ -135,7 +170,18 @@ class LoginPage extends StatelessWidget {
     log("image");
   }
 
-  void login(u, p) {
-    log(u + ":" + p);
+  void register() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => RegisterPage()),
+    );
+  }
+
+  void login(String u, String p) {
+    log(phoneCtl.text);
+    // setState(() {
+    //   count++;
+    //   text = "Login : $count";
+    // });
   }
 }
