@@ -1,7 +1,10 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:start_flutter/model/requests/customer_login_post.dart';
+import 'package:start_flutter/model/response/Cuctomer_login_post.dart';
 import 'package:start_flutter/pages/register.dart';
+import 'package:http/http.dart' as http;
 import 'package:start_flutter/pages/showtrip.dart';
 
 class LoginPage extends StatefulWidget {
@@ -180,19 +183,40 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void login(String u, String p) {
-    if (u == 'admin' && p == "admin") {
-      log("login success");
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => ShowtripPage()),
-      );
-      setState(() {
-        text = '';
-      });
-    } else {
-      setState(() {
-        text = "เบอร์หรือรหัสผ่านไม่ถูกต้อง";
-      });
-    }
+    CustomerLoginPostRequests data = CustomerLoginPostRequests(
+      phone: u,
+      password: p,
+    );
+    http
+        .post(
+          Uri.parse('http://172.29.0.1:3000/customers/login'),
+          headers: {"Content-Type": "application/json; charset=utf-8"},
+          body: customerLoginPostRequestsToJson(data),
+        )
+        .then((value) {
+          CustomerLoginPostResponse c = customerLoginPostResponseFromJson(
+            value.body,
+          );
+          log(c.customer.fullname);
+          Navigator.push(
+            // ignore: use_build_context_synchronously
+            context,
+            MaterialPageRoute(builder: (context) => ShowtripPage()),
+          );
+        });
+    // if (u == 'admin' && p == "admin") {
+    //   log("login success");
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(builder: (context) => ShowtripPage()),
+    // );
+    //   setState(() {
+    //     text = '';
+    //   });
+    // } else {
+    //   setState(() {
+    //     text = "เบอร์หรือรหัสผ่านไม่ถูกต้อง";
+    //   });
+    // }
   }
 }
