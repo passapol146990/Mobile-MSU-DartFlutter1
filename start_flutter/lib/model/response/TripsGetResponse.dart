@@ -20,7 +20,7 @@ class TripsGetResponse {
   String detail;
   int price;
   int duration;
-  DestinationZone destinationZone;
+  String destinationZone;
 
   TripsGetResponse({
     required this.idx,
@@ -42,7 +42,7 @@ class TripsGetResponse {
         detail: json["detail"],
         price: json["price"],
         duration: json["duration"],
-        destinationZone: destinationZoneValues.map[json["destination_zone"]]!,
+        destinationZone: json["destination_zone"],
       );
 
   Map<String, dynamic> toJson() => {

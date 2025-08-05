@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:start_flutter/config/config.dart';
@@ -140,43 +138,32 @@ class ShowtripPage extends StatefulWidget {
 
 class _ShowtripPageState extends State<ShowtripPage>
     with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  List<String> zone = ["ทั้งหมด", "เอเชีย", "ยุโรป", "อาเซียน", "ไทย"];
+  List<String> zone = [
+    "เอเชีย",
+    "ยุโรป",
+    "อาเซียน",
+    "ประเทศไทย",
+    "เอเชียตะวันออกเฉียงใต้",
+  ];
   List<TripsGetResponse> tripsGetResponse = [];
+  List<TripsGetResponse> tripsGetResponseShow = [];
+  late Future<void> loadData;
+  String API_ENDPOINT = "";
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this);
+    loadData = getTrips();
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  String API_ENDPOINT = "";
-
-  void getTrips() async {
+  Future<void> getTrips() async {
     await Configuration.getConfig().then((config) {
       API_ENDPOINT = config['apiEndPoint'];
     });
-    log("$API_ENDPOINT/trips");
-    http.get(Uri.parse("$API_ENDPOINT/trips")).then((value) {
-      log(value.body);
-      setState(() {
-        tripsGetResponse = tripsGetResponseFromJson(value.body);
-        log(tripsGetResponse.length.toString());
-      });
-    });
+    var response = await http.get(Uri.parse("$API_ENDPOINT/trips"));
+    tripsGetResponse = tripsGetResponseFromJson(response.body);
+    tripsGetResponseShow = tripsGetResponse;
   }
-
-  // @override
-  // void setState(VoidCallback fn) {
-  // TODO: implement setState
-  // super.setState(getTrips);
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -186,50 +173,85 @@ class _ShowtripPageState extends State<ShowtripPage>
         backgroundColor: Colors.blueAccent,
         foregroundColor: Colors.white,
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 15.0,
-              vertical: 8.0,
-            ),
-            child: Text(
-              "ปลายทาง",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
+      body:
+          // Load data from API
+          FutureBuilder(
+            future: loadData,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState != ConnectionState.done) {
+                //waitting
+                return Center(child: CircularProgressIndicator());
+              }
+              // done
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 15.0,
+                      vertical: 8.0,
+                    ),
+                    child: Text(
+                      "ปลายทาง",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          FilledButton(
+                            onPressed: () {
+                              setState(() {
+                                tripsGetResponseShow = tripsGetResponse;
+                              });
+                            },
+                            child: Text("ทั้งหมด"),
+                          ),
+                          ...zone.map((z) {
+                            return FilledButton(
+                              onPressed: () {
+                                List<TripsGetResponse> resultTrip = [];
+                                for (var trip in tripsGetResponse) {
+                                  if (trip.destinationZone == z) {
+                                    resultTrip.add(trip);
+                                  }
+                                }
+                                setState(() {
+                                  tripsGetResponseShow = resultTrip;
+                                });
+                              },
+                              child: Text(z),
+                            );
+                          }).toList(),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: ListView(
+                      children: tripsGetResponseShow.map((e) {
+                        return CardTrip(
+                          e.name,
+                          e.coverimage,
+                          e.country,
+                          e.duration,
+                          e.price,
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15.0),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: zone.map((item) {
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: FilledButton(onPressed: getTrips, child: Text(item)),
-                  );
-                }).toList(),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Expanded(
-            child: ListView(
-              children: tripsGetResponse.map((e) {
-                return CardTrip(
-                  e.name,
-                  e.coverimage,
-                  e.country,
-                  e.duration,
-                  e.price,
-                );
-              }).toList(),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
