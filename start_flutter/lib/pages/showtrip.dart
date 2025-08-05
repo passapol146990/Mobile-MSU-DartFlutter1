@@ -1,12 +1,16 @@
-import 'package:flutter/material.dart';
+import 'dart:developer';
 
-// CardTrip StatelessWidget remains unchanged and is perfectly fine.
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:start_flutter/config/config.dart';
+import 'package:start_flutter/model/response/TripsGetResponse.dart';
+
 class CardTrip extends StatelessWidget {
   final String title;
   final String img;
   final String country;
-  final String datetime;
-  final String price;
+  final int datetime;
+  final int price;
 
   const CardTrip(
     this.title,
@@ -20,10 +24,7 @@ class CardTrip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        vertical: 8.0,
-        horizontal: 15.0,
-      ), // Adjust padding for vertical list
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 15.0),
       child: Card(
         clipBehavior: Clip.antiAlias,
         elevation: 4.0,
@@ -85,10 +86,13 @@ class CardTrip extends StatelessWidget {
                       children: [
                         Text(country, style: const TextStyle(fontSize: 16)),
                         const SizedBox(height: 4),
-                        Text(datetime, style: const TextStyle(fontSize: 16)),
+                        Text(
+                          datetime.toString(),
+                          style: const TextStyle(fontSize: 16),
+                        ),
                         const SizedBox(height: 4),
                         Text(
-                          price,
+                          price.toString(),
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -100,7 +104,6 @@ class CardTrip extends StatelessWidget {
                           alignment: Alignment.bottomRight,
                           child: FilledButton(
                             onPressed: () {
-                              // Handle button press, e.g., navigate to detail page
                               print("รายละเอียดเพิ่มเติมสำหรับ: $title");
                             },
                             style: FilledButton.styleFrom(
@@ -128,7 +131,6 @@ class CardTrip extends StatelessWidget {
   }
 }
 
-// ShowtripPage (StatefulWidget)
 class ShowtripPage extends StatefulWidget {
   const ShowtripPage({super.key});
 
@@ -140,56 +142,7 @@ class _ShowtripPageState extends State<ShowtripPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   List<String> zone = ["ทั้งหมด", "เอเชีย", "ยุโรป", "อาเซียน", "ไทย"];
-  List<Map<String, String>> trips = [
-    {
-      "title": "อันซันสวิตเซอร์แลนด์",
-      "img":
-          "https://static.amarintv.com/media/PJVlR0ljpN93yYFmwUH51mKzCj3KBj8f2mmG5zgiD3WqoM122Suv7ej6dCIKDeEKrL.jpg",
-      "country": "ประเทศไทย",
-      "datetime": "ระยะเวลา 10 วัน",
-      "price": "ราคา 90,000 บาท",
-    },
-    {
-      "title": "ภูเขาไฟฟูจิ ญี่ปุ่น",
-      "img":
-          "https://static.amarintv.com/media/PJVlR0ljpN93yYFmwUH51mKzCj3KBj8f2mmG5zgiD3WqoM122Suv7ej6dCIKDeEKrL.jpg",
-      "country": "ญี่ปุ่น",
-      "datetime": "ระยะเวลา 7 วัน",
-      "price": "ราคา 65,000 บาท",
-    },
-    {
-      "title": "หอไอเฟล ปารีส",
-      "img":
-          "https://static.amarintv.com/media/PJVlR0ljpN93yYFmwUH51mKzCj3KBj8f2mmG5zgiD3WqoM122Suv7ej6dCIKDeEKrL.jpg",
-      "country": "ฝรั่งเศส",
-      "datetime": "ระยะเวลา 8 วัน",
-      "price": "ราคา 120,000 บาท",
-    },
-    {
-      "title": "อันซันสวิตเซอร์แลนด์",
-      "img":
-          "https://static.amarintv.com/media/PJVlR0ljpN93yYFmwUH51mKzCj3KBj8f2mmG5zgiD3WqoM122Suv7ej6dCIKDeEKrL.jpg",
-      "country": "ประเทศไทย",
-      "datetime": "ระยะเวลา 10 วัน",
-      "price": "ราคา 90,000 บาท",
-    },
-    {
-      "title": "ภูเขาไฟฟูจิ ญี่ปุ่น",
-      "img":
-          "https://static.amarintv.com/media/PJVlR0ljpN93yYFmwUH51mKzCj3KBj8f2mmG5zgiD3WqoM122Suv7ej6dCIKDeEKrL.jpg",
-      "country": "ญี่ปุ่น",
-      "datetime": "ระยะเวลา 7 วัน",
-      "price": "ราคา 65,000 บาท",
-    },
-    {
-      "title": "หอไอเฟล ปารีส",
-      "img":
-          "https://static.amarintv.com/media/PJVlR0ljpN93yYFmwUH51mKzCj3KBj8f2mmG5zgiD3WqoM122Suv7ej6dCIKDeEKrL.jpg",
-      "country": "ฝรั่งเศส",
-      "datetime": "ระยะเวลา 8 วัน",
-      "price": "ราคา 120,000 บาท",
-    },
-  ];
+  List<TripsGetResponse> tripsGetResponse = [];
 
   @override
   void initState() {
@@ -202,6 +155,28 @@ class _ShowtripPageState extends State<ShowtripPage>
     _controller.dispose();
     super.dispose();
   }
+
+  String API_ENDPOINT = "";
+
+  void getTrips() async {
+    await Configuration.getConfig().then((config) {
+      API_ENDPOINT = config['apiEndPoint'];
+    });
+    log("$API_ENDPOINT/trips");
+    http.get(Uri.parse("$API_ENDPOINT/trips")).then((value) {
+      log(value.body);
+      setState(() {
+        tripsGetResponse = tripsGetResponseFromJson(value.body);
+        log(tripsGetResponse.length.toString());
+      });
+    });
+  }
+
+  // @override
+  // void setState(VoidCallback fn) {
+  // TODO: implement setState
+  // super.setState(getTrips);
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -233,7 +208,7 @@ class _ShowtripPageState extends State<ShowtripPage>
                 children: zone.map((item) {
                   return Padding(
                     padding: const EdgeInsets.only(right: 8.0),
-                    child: FilledButton(onPressed: () {}, child: Text(item)),
+                    child: FilledButton(onPressed: getTrips, child: Text(item)),
                   );
                 }).toList(),
               ),
@@ -242,13 +217,13 @@ class _ShowtripPageState extends State<ShowtripPage>
           const SizedBox(height: 16),
           Expanded(
             child: ListView(
-              children: trips.map((item) {
+              children: tripsGetResponse.map((e) {
                 return CardTrip(
-                  item["title"]!,
-                  item["img"]!,
-                  item["country"]!,
-                  item["datetime"]!,
-                  item["price"]!,
+                  e.name,
+                  e.coverimage,
+                  e.country,
+                  e.duration,
+                  e.price,
                 );
               }).toList(),
             ),

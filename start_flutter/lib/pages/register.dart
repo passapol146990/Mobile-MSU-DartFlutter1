@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:start_flutter/config/config.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -168,6 +169,8 @@ class _RegisterPageState extends State<RegisterPage>
     );
   }
 
+  String url = '';
+
   void register(
     String name,
     String phone,
@@ -182,12 +185,12 @@ class _RegisterPageState extends State<RegisterPage>
       "password": password,
       "confirmpassword": confirmpassword,
     };
-    http
-        .post(
-          Uri.parse("http://172.29.0.1:3000/customers"),
-          headers: {"Content-Type": "application/json"},
-          body: jsonEncode(data),
-        )
-        .then((e) => {print(jsonDecode(e.body.message))});
+
+    http.post(
+      Uri.parse("$url/customers"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(data),
+    );
+    // .then((e) => {print(jsonDecode(e.body.message))});
   }
 }
