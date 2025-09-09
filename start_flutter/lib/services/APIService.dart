@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:http/io_client.dart';
 import 'package:start_flutter/model/response/Responsetrips.dart';
 import 'package:start_flutter/services/auth_service.dart';
+import 'package:start_flutter/type/response/responseDTrips.dart';
+import 'package:start_flutter/type/response/responseDUser.dart';
 import 'package:start_flutter/type/response/response_a.dart';
 
 class ApiService {
@@ -77,7 +79,7 @@ class ApiService {
     }
   }
 
-  Future<List<Responsetrips>> GetTrips() async {
+  Future<List<Responsetrips>> getTrips() async {
     final response = await _ioClient.get(
       Uri.parse('$baseUrl/trips'),
       headers: {'Content-Type': 'application/json'},
@@ -86,5 +88,76 @@ class ApiService {
     // print(response.body);
 
     return responsetripsFromJson(response.body);
+  }
+
+  Future<ResponseDTrips> getDTrips(id) async {
+    final response = await _ioClient.get(
+      Uri.parse('$baseUrl/trips/$id'),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    // print(response.body);
+
+    return responseDTripsFromJson(response.body);
+  }
+
+  Future<ResponseDUser> getDUser() async {
+    final session = AuthService.instance.session;
+    if (session != null) {
+      print("ล็อกอินแล้ว: ${session.customer.idx}");
+    } else {
+      print("ยังไม่ได้ล็อกอิน");
+    }
+
+    final response = await _ioClient.get(
+      Uri.parse('$baseUrl/customers/${session?.customer.idx}'),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    print(response.body);
+
+    return responseDUserFromJson(response.body);
+  }
+
+  Future DeleteUser() async {
+    final session = AuthService.instance.session;
+    if (session != null) {
+      print("ล็อกอินแล้ว: ${session.customer.idx}");
+    } else {
+      print("ยังไม่ได้ล็อกอิน");
+    }
+
+    final response = await _ioClient.delete(
+      Uri.parse('$baseUrl/customers/${session?.customer.idx}'),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    print(response.body);
+
+    return true;
+  }
+
+  Future UpdateUser(fullname, phone, email, image) async {
+    final session = AuthService.instance.session;
+    if (session != null) {
+      print("ล็อกอินแล้ว: ${session.customer.idx}");
+    } else {
+      print("ยังไม่ได้ล็อกอิน");
+    }
+
+    final response = await _ioClient.put(
+      Uri.parse('$baseUrl/customers/${session?.customer.idx}'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        "fullname": fullname,
+        "phone": phone,
+        "email": email,
+        "image": image,
+      }),
+    );
+
+    print(response.body);
+
+    return true;
   }
 }

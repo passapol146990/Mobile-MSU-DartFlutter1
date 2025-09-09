@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/route_manager.dart';
+import 'package:start_flutter/pages/ProfilePage.dart';
+import 'package:start_flutter/pages/TripPage.dart';
+import 'package:start_flutter/pages/login.dart';
 import 'package:start_flutter/services/APIService.dart';
+import 'package:start_flutter/services/auth_service.dart';
 
 class CardTrip extends StatelessWidget {
+  final int idx;
   final String title;
   final String img;
   final String country;
@@ -9,6 +16,7 @@ class CardTrip extends StatelessWidget {
   final int price;
 
   const CardTrip(
+    this.idx,
     this.title,
     this.img,
     this.country,
@@ -100,7 +108,7 @@ class CardTrip extends StatelessWidget {
                           alignment: Alignment.bottomRight,
                           child: FilledButton(
                             onPressed: () {
-                              print("รายละเอียดเพิ่มเติมสำหรับ: $title");
+                              Get.to(() => TripPage(idx: idx));
                             },
                             style: FilledButton.styleFrom(
                               padding: const EdgeInsets.symmetric(
@@ -154,7 +162,7 @@ class _HomePageState extends State<HomePage>
   }
 
   Future<void> getTrips() async {
-    final response = await ApiService().GetTrips();
+    final response = await ApiService().getTrips();
     setState(() {
       tripsGetResponseShow = response;
       tripsGetResponse = response;
@@ -167,7 +175,34 @@ class _HomePageState extends State<HomePage>
       appBar: AppBar(
         title: const Text("รายการทริป"),
         backgroundColor: Colors.blueAccent,
+        automaticallyImplyLeading: false,
         foregroundColor: Colors.white,
+        actions: [
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              print(value);
+              if (value == 'profile') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProfilePage()),
+                );
+              } else if (value == 'logout') {
+                AuthService.instance.logout();
+                Get.offAll(LoginPage());
+              }
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem<String>(
+                value: 'profile',
+                child: Text('ข้อมูลส่วนตัว'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'logout',
+                child: Text('ออกจากระบบ'),
+              ),
+            ],
+          ),
+        ],
       ),
       body:
           // Load data from API
@@ -233,6 +268,7 @@ class _HomePageState extends State<HomePage>
                     child: ListView(
                       children: tripsGetResponseShow.map((e) {
                         return CardTrip(
+                          e.idx,
                           e.name,
                           e.coverimage,
                           e.country,
