@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:start_flutter/config/config.dart';
-import 'package:start_flutter/model/response/TripsGetResponse.dart';
+import 'package:start_flutter/services/APIService.dart';
 
 class CardTrip extends StatelessWidget {
   final String title;
@@ -129,14 +127,14 @@ class CardTrip extends StatelessWidget {
   }
 }
 
-class ShowtripPage extends StatefulWidget {
-  const ShowtripPage({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
-  State<ShowtripPage> createState() => _ShowtripPageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _ShowtripPageState extends State<ShowtripPage>
+class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   List<String> zone = [
     "เอเชีย",
@@ -145,10 +143,9 @@ class _ShowtripPageState extends State<ShowtripPage>
     "ประเทศไทย",
     "เอเชียตะวันออกเฉียงใต้",
   ];
-  List<TripsGetResponse> tripsGetResponse = [];
-  List<TripsGetResponse> tripsGetResponseShow = [];
+  List tripsGetResponse = [];
+  List tripsGetResponseShow = [];
   late Future<void> loadData;
-  String API_ENDPOINT = "";
 
   @override
   void initState() {
@@ -157,12 +154,11 @@ class _ShowtripPageState extends State<ShowtripPage>
   }
 
   Future<void> getTrips() async {
-    await Configuration.getConfig().then((config) {
-      API_ENDPOINT = config['apiEndPoint'];
+    final response = await ApiService().GetTrips();
+    setState(() {
+      tripsGetResponseShow = response;
+      tripsGetResponse = response;
     });
-    var response = await http.get(Uri.parse("$API_ENDPOINT/trips"));
-    tripsGetResponse = tripsGetResponseFromJson(response.body);
-    tripsGetResponseShow = tripsGetResponse;
   }
 
   @override
@@ -208,16 +204,14 @@ class _ShowtripPageState extends State<ShowtripPage>
                         children: [
                           FilledButton(
                             onPressed: () {
-                              setState(() {
-                                tripsGetResponseShow = tripsGetResponse;
-                              });
+                              getTrips();
                             },
                             child: Text("ทั้งหมด"),
                           ),
                           ...zone.map((z) {
                             return FilledButton(
                               onPressed: () {
-                                List<TripsGetResponse> resultTrip = [];
+                                List resultTrip = [];
                                 for (var trip in tripsGetResponse) {
                                   if (trip.destinationZone == z) {
                                     resultTrip.add(trip);

@@ -1,8 +1,7 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:start_flutter/config/config.dart';
+import 'package:get/route_manager.dart';
+import 'package:start_flutter/pages/login.dart';
+import 'package:start_flutter/services/APIService.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -83,7 +82,7 @@ class _RegisterPageState extends State<RegisterPage>
                     _passapol_input(
                       "หมายเลขโทรศัพท์",
                       phone,
-                      TextInputType.phone,
+                      TextInputType.text,
                       false,
                     ),
                     _passapol_input(
@@ -172,25 +171,35 @@ class _RegisterPageState extends State<RegisterPage>
   String url = '';
 
   void register(
-    String name,
+    String fullname,
     String phone,
     String email,
     String password,
     String confirmpassword,
-  ) {
-    var data = {
-      "fullname": name,
-      "phone": phone,
-      "email": email,
-      "password": password,
-      "confirmpassword": confirmpassword,
-    };
-
-    http.post(
-      Uri.parse("$url/customers"),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode(data),
+  ) async {
+    final response = await ApiService().register(
+      fullname,
+      phone,
+      email,
+      password,
+      confirmpassword,
     );
-    // .then((e) => {print(jsonDecode(e.body.message))});
+
+    final status = response.status;
+    final message = response.message;
+
+    if (!context.mounted) return;
+
+    final snackBar = SnackBar(
+      content: Text(message),
+      backgroundColor: status == 200 ? Colors.green : Colors.red,
+    );
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(snackBar);
+
+    if (status == 200) {
+      Get.offAll(() => const LoginPage());
+    }
   }
 }

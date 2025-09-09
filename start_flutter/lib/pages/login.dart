@@ -1,11 +1,10 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:start_flutter/config/config.dart';
-import 'package:start_flutter/model/requests/customer_login_post.dart';
+import 'package:get/route_manager.dart';
+import 'package:start_flutter/pages/HomePage.dart';
 import 'package:start_flutter/pages/register.dart';
-import 'package:start_flutter/pages/showtrip.dart';
+import 'package:start_flutter/services/APIService.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -71,7 +70,7 @@ class _LoginPageState extends State<LoginPage> {
                                 controller: phoneCtl,
                                 style: TextStyle(color: Colors.white),
                                 decoration: InputDecoration(
-                                  hintText: "admin",
+                                  hintText: "08x xxx xxxx",
                                   border: OutlineInputBorder(
                                     borderSide: BorderSide(width: 1),
                                   ),
@@ -98,7 +97,7 @@ class _LoginPageState extends State<LoginPage> {
                                 obscureText: true,
                                 style: TextStyle(color: Colors.white),
                                 decoration: InputDecoration(
-                                  hintText: "admin",
+                                  hintText: "******",
                                   border: OutlineInputBorder(
                                     borderSide: BorderSide(width: 1),
                                   ),
@@ -176,35 +175,30 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void register() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => RegisterPage()),
-    );
+    Get.to(RegisterPage());
   }
 
-  String API_ENDPOINT = 'test';
+  void login(String phone, String password) async {
+    final response = await ApiService().login(phone, password);
+    final status = response['status'] ?? 400;
+    final message =
+        response['message'] ??
+        (status == 200 ? 'สมัครสมาชิกสำเร็จ' : 'เกิดข้อผิดพลาด');
 
-  void login(String u, String p) {
-    CustomerLoginPostRequests data = CustomerLoginPostRequests(
-      phone: u,
-      password: p,
+    if (!context.mounted) return;
+
+    print(message);
+
+    final snackBar = SnackBar(
+      content: Text(message),
+      backgroundColor: status == 200 ? Colors.green : Colors.red,
     );
-    Configuration.getConfig().then((config) {
-      API_ENDPOINT = config['apiEndPoint'];
-    });
-    // log(u + ':' + p);
-    // log(API_ENDPOINT);
-    http
-        .post(
-          Uri.parse('$API_ENDPOINT/customers/login'),
-          headers: {"Content-Type": "application/json; charset=utf-8"},
-          body: customerLoginPostRequestsToJson(data),
-        )
-        .then((value) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => ShowtripPage()),
-          );
-        });
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(snackBar);
+
+    if (status == 200) {
+      Get.offAll(() => const HomePage());
+    }
   }
 }
